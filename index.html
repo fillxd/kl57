@@ -567,12 +567,29 @@
 		
 		// Track changes in main calendar for news
 // Simple solution - import all news from main calendar
+// Track changes in main calendar for news - tylko dla nauczycieli klasy
 function trackMainCalendarChanges() {
     databaseMain.ref('schoolCalendarNews').on('value', (snapshot) => {
         const mainNews = snapshot.val() || [];
         
-        // Oznacz wszystkie jako zaimportowane
-        const importedNews = mainNews.map(item => ({
+        // Filtruj tylko aktualności dotyczące nauczycieli tej klasy
+        const filteredNews = mainNews.filter(item => {
+            // Sprawdzamy czy aktualność dotyczy nieobecności nauczyciela z naszej klasy
+            if (item.action && item.action.includes('nieobecność') && item.details) {
+                // Sprawdzamy czy któryś z nauczycieli klasy występuje w szczegółach
+                return classTeachers.some(teacher => 
+                    item.details.includes(teacher)
+                );
+            }
+            // Importuj wszystkie dni wolne
+            if (item.action && item.action.includes('dzień wolny')) {
+                return true;
+            }
+            return false;
+        });
+        
+        // Oznacz przefiltrowane jako zaimportowane
+        const importedNews = filteredNews.map(item => ({
             ...item,
             imported: true,
             source: 'main'
@@ -695,9 +712,10 @@ async function initCalendar() {
                                     eventText += ` (Lekcje ${event.lessons})`;
                                 }
                                 if (isImported) eventText = `📋 ${eventText}`;
-                            } else if (event.type === 'substitution') {
-                                eventClass = 'substitution';
-                                eventText = `Zastępstwo: ${event.substitutionSubject} (lekcja ${event.lesson})`;
+                           } else if (event.type === 'substitution') {
+    eventClass = 'substitution';
+    eventText = `Zastępstwo: ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutingTeacher}) (lekcja ${event.lesson})`;
+
                             } else if (event.type === 'cancelled') {
                                 eventClass = 'cancelled';
                                 eventText = `Odwołana lekcja: ${event.subject || 'Lekcja'} (lekcja ${event.lesson})`;
@@ -852,18 +870,15 @@ function displayNews() {
                     </div>
                 `;
             } else if (event.type === 'substitution') {
-                detailsHTML = `
-                    <h3>Zastępstwo</h3>
-                    <div class="event-details">
-                        <p><strong>Zastępuje:</strong> ${event.substitutedTeacher}</p>
-                        <p><strong>Przedmiot zastępowany:</strong> ${event.originalSubject}</p>
-                        <p><strong>Zastępujący:</strong> ${event.substitutingTeacher}</p>
-                        <p><strong>Przedmiot na zastępstwie:</strong> ${event.substitutionSubject}</p>
-                        <p><strong>Data:</strong> ${formatDate(event.date)}</p>
-                        <p><strong>Lekcja:</strong> ${event.lesson}</p>
-                        <p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>
-                    </div>
-                `;
+    detailsHTML = `
+        <h3>Zastępstwo</h3>
+        <div class="event-details">
+            <p><strong>Zastępstwo:</strong> ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutingTeacher}) (lekcja ${event.lesson})</p>
+            <p><strong>Zastępowany nauczyciel:</strong> ${event.substitutedTeacher}</p>
+            <p><strong>Data:</strong> ${formatDate(event.date)}</p>
+            <p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>
+        </div>
+    `;
             } else if (event.type === 'cancelled') {
                 detailsHTML = `
                     <h3>Odwołana lekcja: ${event.subject || ''}</h3>
@@ -1366,4 +1381,3 @@ function displayNews() {
     </script>
 </body>
 </html>
-
