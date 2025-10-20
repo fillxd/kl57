@@ -564,24 +564,30 @@ let currentMonth, currentYear;
             });
         }
 		
-		// Track changes in main calendar for news
-// Simple solution - import all news from main calendar
-// Track changes in main calendar for news - tylko dla nauczycieli klasy
+// Track changes in main calendar for news - tylko dla klasy 5b
+// Track changes in main calendar for news - tylko dla klasy 5b
 function trackMainCalendarChanges() {
     databaseMain.ref('schoolCalendarNews').on('value', (snapshot) => {
         const mainNews = snapshot.val() || [];
         
-        // Filtruj tylko aktualności dotyczące nauczycieli tej klasy
+        // Filtruj tylko aktualności dotyczące klasy 5b
         const filteredNews = mainNews.filter(item => {
             // Sprawdzamy czy aktualność dotyczy nieobecności nauczyciela z naszej klasy
             if (item.action && item.action.includes('nieobecność') && item.details) {
-                // Sprawdzamy czy któryś z nauczycieli klasy występuje w szczegółach
-                return classTeachers.some(teacher => 
-                    item.details.includes(teacher)
-                );
+                return classTeachers.some(teacher => item.details.includes(teacher));
             }
-            // Importuj wszystkie dni wolne
+            // Importuj tylko wycieczki klasy 5b
+            if (item.action && (item.action.includes('wycieczka') || item.action.includes('Wycieczka'))) {
+                return item.details && (item.details.includes('5b') || item.details.toLowerCase().includes('klasa 5b'));
+            }
+            // Importuj tylko dni wolne szkoły lub dni wolne klasy 5b
             if (item.action && item.action.includes('dzień wolny')) {
+                // Jeśli w szczegółach jest wzmianka o klasie
+                if (item.details && (item.details.includes('klasa') || item.details.includes('Klasa'))) {
+                    // Sprawdzamy czy to dzień wolny dla klasy 5b
+                    return item.details.includes('5b') || item.details.toLowerCase().includes('klasa 5b');
+                }
+                // Jeśli nie ma wzmianki o klasie, to jest to dzień wolny szkoły (dla wszystkich)
                 return true;
             }
             return false;
