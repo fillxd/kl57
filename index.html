@@ -515,9 +515,8 @@
         const tabContents = document.querySelectorAll('.tab-content');
         const newsContainer = document.getElementById('news-container');
         
-        // Current month and year
-        let currentMonth = 8; // September (0-indexed)
-        let currentYear = 2025;
+// Current month and year - będą ustawiane automatycznie
+let currentMonth, currentYear;
         
         // Load events from Firebase (własne wydarzenia klasy)
         function loadClassEvents() {
@@ -654,10 +653,14 @@ async function initCalendar() {
     // Start tracking main calendar changes
     trackMainCalendarChanges();
     
-    // Set current month and year from select value
-    const selectedValue = monthSelect.value.split('-');
-    currentYear = parseInt(selectedValue[0]);
-    currentMonth = parseInt(selectedValue[1]) - 1;
+    // Ustaw aktualny miesiąc i rok zamiast stałej wartości
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-11 (0=styczeń, 8=wrzesień)
+    
+    // Ustaw wartość w selektorze miesięcy
+    const currentMonthValue = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+    monthSelect.value = currentMonthValue;
     
     generateCalendar(currentYear, currentMonth);
     displayNews();
@@ -1261,25 +1264,25 @@ function displayNews() {
             let newsDetails = '';
             
             if (type === 'absence') {
-                newsAction = isEdit ? 'Edytowano nieobecność nauczyciela' : 'Dodano nieobecność nauczyciela';
+                newsAction = isEdit ? 'Zmieniono nieobecność nauczyciela' : 'Dodano nieobecność nauczyciela';
                 const dateRange = eventData.startDate === eventData.endDate 
                     ? `w dniu ${formatDate(eventData.startDate)}`
                     : `od ${formatDate(eventData.startDate)} do ${formatDate(eventData.endDate)}`;
                 newsDetails = `${eventData.teacher} ${dateRange}`;
             } else if (type === 'substitution') {
-                newsAction = isEdit ? 'Edytowano zastępstwo' : 'Dodano zastępstwo';
+                newsAction = isEdit ? 'Zmieniono zastępstwo' : 'Dodano zastępstwo';
                 newsDetails = `${eventData.substitutionSubject} (lekcja ${eventData.lesson}) w dniu ${formatDate(eventData.date)}`;
             } else if (type === 'cancelled') {
-                newsAction = isEdit ? 'Edytowano odwołaną lekcję' : 'Dodano odwołaną lekcję';
+                newsAction = isEdit ? 'Zmieniono odwołaną lekcję' : 'Dodano odwołaną lekcję';
                 newsDetails = `lekcja ${eventData.lesson} w dniu ${formatDate(eventData.date)}`;
             } else if (type === 'quiz') {
-                newsAction = isEdit ? 'Edytowano kartkówkę' : 'Dodano kartkówkę';
+                newsAction = isEdit ? 'Zmieniono kartkówkę' : 'Dodano kartkówkę';
                 newsDetails = `z ${eventData.subject} w dniu ${formatDate(eventData.date)}`;
             } else if (type === 'exam') {
-                newsAction = isEdit ? 'Edytowano sprawdzian' : 'Dodano sprawdzian';
+                newsAction = isEdit ? 'Zmieniono sprawdzian' : 'Dodano sprawdzian';
                 newsDetails = `z ${eventData.subject} w dniu ${formatDate(eventData.date)}`;
             } else if (type === 'holiday') {
-                newsAction = isEdit ? 'Edytowano dzień wolny' : 'Dodano dzień wolny';
+                newsAction = isEdit ? 'Zmieniono dzień wolny' : 'Dodano dzień wolny';
                 const dateRange = eventData.startDate === eventData.endDate 
                     ? `w dniu ${formatDate(eventData.startDate)}`
                     : `od ${formatDate(eventData.startDate)} do ${formatDate(eventData.endDate)}`;
