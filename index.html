@@ -516,7 +516,6 @@
         const newsContainer = document.getElementById('news-container');
         
 // Current month and year - będą ustawiane automatycznie
-let currentMonth, currentYear;
         
         // Load events from Firebase (własne wydarzenia klasy)
         function loadClassEvents() {
@@ -650,8 +649,13 @@ function trackMainCalendarChanges() {
             
             return saveNews();
         }
-        
-// Initialize the calendar
+		
+        // Update calendar based on month selector
+function updateCalendarFromSelector() {
+    const [year, month] = monthSelect.value.split('-').map(Number);
+    generateCalendar(year, month - 1); // month - 1 bo miesiące są 0-11
+}
+
 async function initCalendar() {
     // Load events and news from Firebase
     await Promise.all([loadClassEvents(), loadMainCalendarEvents(), loadNews()]);
@@ -659,16 +663,13 @@ async function initCalendar() {
     // Start tracking main calendar changes
     trackMainCalendarChanges();
     
-    // Ustaw aktualny miesiąc i rok zamiast stałej wartości
+    // Ustaw aktualny miesiąc i rok
     const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0-11 (0=styczeń, 8=wrzesień)
-    
-    // Ustaw wartość w selektorze miesięcy
-    const currentMonthValue = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+    const currentMonthValue = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     monthSelect.value = currentMonthValue;
     
-    generateCalendar(currentYear, currentMonth);
+    // Generuj kalendarz dla wybranego miesiąca
+    updateCalendarFromSelector();
     displayNews();
 }
         
@@ -1372,7 +1373,7 @@ function displayNews() {
         });
         
         // Event listeners
-        monthSelect.addEventListener('change', initCalendar);
+monthSelect.addEventListener('change', updateCalendarFromSelector);
         addEventBtn.addEventListener('click', () => showEventForm());
         closeModal.addEventListener('click', () => {
             eventModal.style.display = 'none';
