@@ -151,6 +151,11 @@
             background-color: #9b59b6;
             color: white;
         }
+        
+        .class-absence {
+            background-color: #e74c3c;
+            color: white;
+        }
 
         .modal {
             display: none;
@@ -216,6 +221,21 @@
 
         .date-range input {
             flex: 1;
+        }
+        
+        .time-range {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .time-range input[type="time"] {
+            flex: 1;
+        }
+        
+        .time-range input[type="checkbox"] {
+            width: auto;
+            margin-right: 5px;
         }
 
         .form-actions {
@@ -515,8 +535,6 @@
         const tabContents = document.querySelectorAll('.tab-content');
         const newsContainer = document.getElementById('news-container');
         
-// Current month and year - będą ustawiane automatycznie
-        
         // Load events from Firebase (własne wydarzenia klasy)
         function loadClassEvents() {
             return new Promise((resolve) => {
@@ -563,55 +581,54 @@
             });
         }
 		
-// Track changes in main calendar for news - tylko dla klasy 5b
-// Track changes in main calendar for news - tylko dla klasy 5b
-function trackMainCalendarChanges() {
-    databaseMain.ref('schoolCalendarNews').on('value', (snapshot) => {
-        const mainNews = snapshot.val() || [];
-        
-        // Filtruj tylko aktualności dotyczące klasy 5b
-        const filteredNews = mainNews.filter(item => {
-            // Sprawdzamy czy aktualność dotyczy nieobecności nauczyciela z naszej klasy
-            if (item.action && item.action.includes('nieobecność') && item.details) {
-                return classTeachers.some(teacher => item.details.includes(teacher));
-            }
-            // Importuj tylko wycieczki klasy 5b
-            if (item.action && (item.action.includes('wycieczka') || item.action.includes('Wycieczka'))) {
-                return item.details && (item.details.includes('5b') || item.details.toLowerCase().includes('klasa 5b'));
-            }
-            // Importuj tylko dni wolne szkoły lub dni wolne klasy 5b
-            if (item.action && item.action.includes('dzień wolny')) {
-                // Jeśli w szczegółach jest wzmianka o klasie
-                if (item.details && (item.details.includes('klasa') || item.details.includes('Klasa'))) {
-                    // Sprawdzamy czy to dzień wolny dla klasy 5b
-                    return item.details.includes('5b') || item.details.toLowerCase().includes('klasa 5b');
-                }
-                // Jeśli nie ma wzmianki o klasie, to jest to dzień wolny szkoły (dla wszystkich)
-                return true;
-            }
-            return false;
-        });
-        
-        // Oznacz przefiltrowane jako zaimportowane
-        const importedNews = filteredNews.map(item => ({
-            ...item,
-            imported: true,
-            source: 'main'
-        }));
-        
-        // Połącz z własnymi aktualnościami (unikaj duplikatów na podstawie timestamp)
-        const existingTimestamps = new Set(news.map(item => item.timestamp));
-        const newImportedNews = importedNews.filter(item => !existingTimestamps.has(item.timestamp));
-        
-        news = [...newImportedNews, ...news];
-        
-        // Posortuj i ogranicz
-        news.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        news = news.slice(0, 100);
-        
-        displayNews();
-    });
-}
+        // Track changes in main calendar for news - tylko dla klasy 5b
+        function trackMainCalendarChanges() {
+            databaseMain.ref('schoolCalendarNews').on('value', (snapshot) => {
+                const mainNews = snapshot.val() || [];
+                
+                // Filtruj tylko aktualności dotyczące klasy 5b
+                const filteredNews = mainNews.filter(item => {
+                    // Sprawdzamy czy aktualność dotyczy nieobecności nauczyciela z naszej klasy
+                    if (item.action && item.action.includes('nieobecność') && item.details) {
+                        return classTeachers.some(teacher => item.details.includes(teacher));
+                    }
+                    // Importuj tylko wycieczki klasy 5b
+                    if (item.action && (item.action.includes('wycieczka') || item.action.includes('Wycieczka'))) {
+                        return item.details && (item.details.includes('5b') || item.details.toLowerCase().includes('klasa 5b'));
+                    }
+                    // Importuj tylko dni wolne szkoły lub dni wolne klasy 5b
+                    if (item.action && item.action.includes('dzień wolny')) {
+                        // Jeśli w szczegółach jest wzmianka o klasie
+                        if (item.details && (item.details.includes('klasa') || item.details.includes('Klasa'))) {
+                            // Sprawdzamy czy to dzień wolny dla klasy 5b
+                            return item.details.includes('5b') || item.details.toLowerCase().includes('klasa 5b');
+                        }
+                        // Jeśli nie ma wzmianki o klasie, to jest to dzień wolny szkoły (dla wszystkich)
+                        return true;
+                    }
+                    return false;
+                });
+                
+                // Oznacz przefiltrowane jako zaimportowane
+                const importedNews = filteredNews.map(item => ({
+                    ...item,
+                    imported: true,
+                    source: 'main'
+                }));
+                
+                // Połącz z własnymi aktualnościami (unikaj duplikatów na podstawie timestamp)
+                const existingTimestamps = new Set(news.map(item => item.timestamp));
+                const newImportedNews = importedNews.filter(item => !existingTimestamps.has(item.timestamp));
+                
+                news = [...newImportedNews, ...news];
+                
+                // Posortuj i ogranicz
+                news.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                news = news.slice(0, 100);
+                
+                displayNews();
+            });
+        }
         
         // Load news from Firebase
         function loadNews() {
@@ -651,27 +668,27 @@ function trackMainCalendarChanges() {
         }
 		
         // Update calendar based on month selector
-function updateCalendarFromSelector() {
-    const [year, month] = monthSelect.value.split('-').map(Number);
-    generateCalendar(year, month - 1); // month - 1 bo miesiące są 0-11
-}
+        function updateCalendarFromSelector() {
+            const [year, month] = monthSelect.value.split('-').map(Number);
+            generateCalendar(year, month - 1); // month - 1 bo miesiące są 0-11
+        }
 
-async function initCalendar() {
-    // Load events and news from Firebase
-    await Promise.all([loadClassEvents(), loadMainCalendarEvents(), loadNews()]);
-    
-    // Start tracking main calendar changes
-    trackMainCalendarChanges();
-    
-    // Ustaw aktualny miesiąc i rok
-    const now = new Date();
-    const currentMonthValue = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    monthSelect.value = currentMonthValue;
-    
-    // Generuj kalendarz dla wybranego miesiąca
-    updateCalendarFromSelector();
-    displayNews();
-}
+        async function initCalendar() {
+            // Load events and news from Firebase
+            await Promise.all([loadClassEvents(), loadMainCalendarEvents(), loadNews()]);
+            
+            // Start tracking main calendar changes
+            trackMainCalendarChanges();
+            
+            // Ustaw aktualny miesiąc i rok
+            const now = new Date();
+            const currentMonthValue = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            monthSelect.value = currentMonthValue;
+            
+            // Generuj kalendarz dla wybranego miesiąca
+            updateCalendarFromSelector();
+            displayNews();
+        }
         
         // Generate calendar for given month and year
         function generateCalendar(year, month) {
@@ -722,23 +739,25 @@ async function initCalendar() {
                                     eventText += ` (Lekcje ${event.lessons})`;
                                 }
                                 if (isImported) eventText = `📋 ${eventText}`;
-                           } else if (event.type === 'substitution') {
-    eventClass = 'substitution';
-    eventText = `Zastępstwo: ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutingTeacher}) (lekcja ${event.lesson})`;
-
+                            } else if (event.type === 'substitution') {
+                                eventClass = 'substitution';
+                                eventText = `Zastępstwo: ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutingTeacher}) (lekcja ${event.lesson})`;
                             } else if (event.type === 'cancelled') {
                                 eventClass = 'cancelled';
                                 eventText = `Odwołana lekcja: ${event.subject || 'Lekcja'} (lekcja ${event.lesson})`;
                             } else if (event.type === 'quiz') {
                                 eventClass = 'quiz';
-                                eventText = `Kartkówka: ${event.subject}`;
+                                eventText = `Kartkówka: ${event.subject} (lekcja ${event.lesson})`;
                             } else if (event.type === 'exam') {
                                 eventClass = 'exam';
-                                eventText = `Sprawdzian: ${event.subject}`;
+                                eventText = `Sprawdzian: ${event.subject} (lekcja ${event.lesson})`;
                             } else if (event.type === 'holiday') {
                                 eventClass = 'holiday';
                                 eventText = `Dzień Wolny: ${event.title}`;
                                 if (isImported) eventText = `📋 ${eventText}`;
+                            } else if (event.type === 'class-absence') {
+                                eventClass = 'class-absence';
+                                eventText = `Nieobecność klasy 5B (${event.allDay ? 'Cały dzień' : event.timeRange})`;
                             }
                             
                             calendarHTML += `<div class="event ${eventClass}" data-date="${dateStr}" data-index="${index}" data-imported="${isImported}">${eventText}</div>`;
@@ -773,31 +792,31 @@ async function initCalendar() {
             });
         }
         
-// Display news
-function displayNews() {
-    newsContainer.innerHTML = '';
-    
-    if (news.length === 0) {
-        newsContainer.innerHTML = '<p>Brak aktualności.</p>';
-        return;
-    }
-    
-    news.forEach(item => {
-        const newsItem = document.createElement('div');
-        newsItem.className = 'news-item';
-        
-        const timeAgo = getTimeAgo(item.timestamp);
-        const importedLabel = item.imported ? '📋 ' : '';
-        
-        newsItem.innerHTML = `
-            <div class="news-action">${importedLabel}${item.action}</div>
-            <div>${item.details}</div>
-            <div class="news-time">${timeAgo}${item.imported ? ' • Zaimportowane z terminarza szkolnego' : ''}</div>
-        `;
-        
-        newsContainer.appendChild(newsItem);
-    });
-}
+        // Display news
+        function displayNews() {
+            newsContainer.innerHTML = '';
+            
+            if (news.length === 0) {
+                newsContainer.innerHTML = '<p>Brak aktualności.</p>';
+                return;
+            }
+            
+            news.forEach(item => {
+                const newsItem = document.createElement('div');
+                newsItem.className = 'news-item';
+                
+                const timeAgo = getTimeAgo(item.timestamp);
+                const importedLabel = item.imported ? '📋 ' : '';
+                
+                newsItem.innerHTML = `
+                    <div class="news-action">${importedLabel}${item.action}</div>
+                    <div>${item.details}</div>
+                    <div class="news-time">${timeAgo}${item.imported ? ' • Zaimportowane z terminarza szkolnego' : ''}</div>
+                `;
+                
+                newsContainer.appendChild(newsItem);
+            });
+        }
         
         // Calculate time ago
         function getTimeAgo(timestamp) {
@@ -880,15 +899,14 @@ function displayNews() {
                     </div>
                 `;
             } else if (event.type === 'substitution') {
-    detailsHTML = `
-        <h3>Zastępstwo</h3>
-        <div class="event-details">
-            <p><strong>Zastępstwo:</strong> ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutingTeacher}) (lekcja ${event.lesson})</p>
-            <p><strong>Zastępowany nauczyciel:</strong> ${event.substitutedTeacher}</p>
-            <p><strong>Data:</strong> ${formatDate(event.date)}</p>
-            <p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>
-        </div>
-    `;
+                detailsHTML = `
+                    <h3>Zastępstwo</h3>
+                    <div class="event-details">
+                        <p><strong>Zastępstwo:</strong> ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutedTeacher} > ${event.substitutingTeacher}) (lekcja ${event.lesson})</p>
+                        <p><strong>Data:</strong> ${formatDate(event.date)}</p>
+                        <p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>
+                    </div>
+                `;
             } else if (event.type === 'cancelled') {
                 detailsHTML = `
                     <h3>Odwołana lekcja: ${event.subject || ''}</h3>
@@ -920,6 +938,17 @@ function displayNews() {
                     <div class="event-details">
                         <p><strong>Tytuł:</strong> ${event.title}</p>
                         <p><strong>Data:</strong> ${formatDate(event.startDate)}${event.endDate && event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</p>
+                        <p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>
+                    </div>
+                `;
+            } else if (event.type === 'class-absence') {
+                detailsHTML = `
+                    <h3>Nieobecność klasy</h3>
+                    <div class="event-details">
+                        <p><strong>Klasa:</strong> 5B</p>
+                        <p><strong>Data:</strong> ${formatDate(event.startDate)}${event.endDate && event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</p>
+                        <p><strong>Godziny:</strong> ${event.allDay ? 'Cały dzień' : event.timeRange}</p>
+                        ${event.description ? `<p><strong>Opis:</strong> ${event.description}</p>` : ''}
                         <p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>
                     </div>
                 `;
@@ -956,27 +985,31 @@ function displayNews() {
                             : `od ${formatDate(currentEditingEvent.startDate)} do ${formatDate(currentEditingEvent.endDate)}`;
                         newsDetails = `${currentEditingEvent.teacher} ${dateRange}`;
                     } else if (currentEditingEvent.type === 'substitution') {
-                        newsAction = 'Usunięto zastępstwo';
-                        newsDetails = `${currentEditingEvent.substitutionSubject} (lekcja ${currentEditingEvent.lesson}) w dniu ${formatDate(currentEditingEvent.date)}`;
+                        newsAction = `Usunięto zastępstwo w dniu ${formatDate(currentEditingEvent.date)}.`;
+                        newsDetails = `${currentEditingEvent.originalSubject} > ${currentEditingEvent.substitutionSubject} (${currentEditingEvent.substitutedTeacher} > ${currentEditingEvent.substitutingTeacher}) (lekcja ${currentEditingEvent.lesson})`;
                     } else if (currentEditingEvent.type === 'cancelled') {
-                        newsAction = 'Usunięto odwołaną lekcję';
-                        newsDetails = `lekcja ${currentEditingEvent.lesson} w dniu ${formatDate(currentEditingEvent.date)}`;
+                        newsAction = `Usunięto odwołanie lekcji ${currentEditingEvent.subject || ''} w dniu ${formatDate(currentEditingEvent.date)}`;
+                        newsDetails = `(lekcja ${currentEditingEvent.lesson})`;
                     } else if (currentEditingEvent.type === 'quiz') {
-                        newsAction = 'Usunięto kartkówkę';
-                        newsDetails = `z ${currentEditingEvent.subject} w dniu ${formatDate(currentEditingEvent.date)}`;
+                        newsAction = `Usunięto wydarzenie w dniu ${formatDate(currentEditingEvent.date)}: Kartkówka`;
+                        newsDetails = `Przedmiot: ${currentEditingEvent.subject} (lekcja ${currentEditingEvent.lesson})`;
                     } else if (currentEditingEvent.type === 'exam') {
-                        newsAction = 'Usunięto sprawdzian';
-                        newsDetails = `z ${currentEditingEvent.subject} w dniu ${formatDate(currentEditingEvent.date)}`;
+                        newsAction = `Usunięto wydarzenie w dniu ${formatDate(currentEditingEvent.date)}: Sprawdzian`;
+                        newsDetails = `Przedmiot: ${currentEditingEvent.subject} (lekcja ${currentEditingEvent.lesson})`;
                     } else if (currentEditingEvent.type === 'holiday') {
                         newsAction = 'Usunięto dzień wolny';
                         const dateRange = currentEditingEvent.startDate === currentEditingEvent.endDate || !currentEditingEvent.endDate 
                             ? `w dniu ${formatDate(currentEditingEvent.startDate)}`
                             : `od ${formatDate(currentEditingEvent.startDate)} do ${formatDate(currentEditingEvent.endDate)}`;
                         newsDetails = `"${currentEditingEvent.title}" ${dateRange}`;
+                    } else if (currentEditingEvent.type === 'class-absence') {
+                        const timeInfo = currentEditingEvent.allDay ? '' : ` w godzinach ${currentEditingEvent.timeRange}`;
+                        newsAction = `Usunięto nieobecność klasy w dniu ${formatDate(currentEditingEvent.startDate)}${timeInfo}`;
+                        newsDetails = currentEditingEvent.description || '';
                     }
                     
-                    // For range events (absence, holiday), we need to remove from all dates
-                    if (currentEditingEvent.type === 'absence' || currentEditingEvent.type === 'holiday') {
+                    // For range events, we need to remove from all dates
+                    if (currentEditingEvent.type === 'absence' || currentEditingEvent.type === 'holiday' || currentEditingEvent.type === 'class-absence') {
                         const startDate = new Date(currentEditingEvent.startDate);
                         const endDate = new Date(currentEditingEvent.endDate || currentEditingEvent.startDate);
                         
@@ -985,7 +1018,6 @@ function displayNews() {
                             if (events[dateKey]) {
                                 events[dateKey] = events[dateKey].filter(e => 
                                     !(e.type === currentEditingEvent.type && 
-                                      e.teacher === currentEditingEvent.teacher && 
                                       e.startDate === currentEditingEvent.startDate)
                                 );
                                 if (events[dateKey].length === 0) {
@@ -1020,7 +1052,8 @@ function displayNews() {
                 modalTitle.textContent = 'Dodaj wydarzenie';
                 modalBody.innerHTML = `
                     <div class="event-type-selector">
-                        <div class="event-type" data-type="absence">Nieobecność</div>
+                        <div class="event-type" data-type="absence">Nieobecność nauczyciela</div>
+                        <div class="event-type" data-type="class-absence">Nieobecność klasy</div>
                         <div class="event-type" data-type="substitution">Zastępstwo</div>
                         <div class="event-type" data-type="cancelled">Odwołana lekcja</div>
                         <div class="event-type" data-type="quiz">Kartkówka</div>
@@ -1065,6 +1098,32 @@ function displayNews() {
                     <div class="form-group">
                         <label for="absence-lessons">Lekcje (np. 1-5):</label>
                         <input type="text" id="absence-lessons" value="${isEdit ? eventData.lessons || '' : ''}">
+                    </div>
+                `;
+            } else if (type === 'class-absence') {
+                formHTML = `
+                    <div class="form-group">
+                        <label>Data nieobecności klasy:</label>
+                        <div class="date-range">
+                            <input type="date" id="class-absence-start-date" value="${isEdit ? eventData.startDate : ''}" required>
+                            <input type="date" id="class-absence-end-date" value="${isEdit ? eventData.endDate || eventData.startDate : ''}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Godziny nieobecności:</label>
+                        <div class="time-range">
+                            <input type="checkbox" id="all-day" ${isEdit && eventData.allDay ? 'checked' : ''}>
+                            <label for="all-day" style="display: inline; margin: 0;">Cały dzień</label>
+                        </div>
+                        <div class="time-range" id="time-inputs" style="${isEdit && eventData.allDay ? 'display: none;' : ''}margin-top: 10px;">
+                            <input type="time" id="start-time" value="${isEdit && eventData.startTime ? eventData.startTime : '08:00'}">
+                            <span>do</span>
+                            <input type="time" id="end-time" value="${isEdit && eventData.endTime ? eventData.endTime : '15:00'}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="class-absence-description">Opis (opcjonalnie):</label>
+                        <textarea id="class-absence-description">${isEdit ? eventData.description || '' : ''}</textarea>
                     </div>
                 `;
             } else if (type === 'substitution') {
@@ -1165,6 +1224,20 @@ function displayNews() {
             
             modalBody.innerHTML = formHTML;
             
+            // Add event listener for all-day checkbox if it's class absence
+            if (type === 'class-absence') {
+                const allDayCheckbox = document.getElementById('all-day');
+                const timeInputs = document.getElementById('time-inputs');
+                
+                allDayCheckbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        timeInputs.style.display = 'none';
+                    } else {
+                        timeInputs.style.display = 'flex';
+                    }
+                });
+            }
+            
             document.getElementById('cancel-form').addEventListener('click', function() {
                 eventModal.style.display = 'none';
                 resetEditingContext();
@@ -1190,6 +1263,24 @@ function displayNews() {
                 
                 if (!eventData.teacher || !eventData.startDate) {
                     alert('Proszę wypełnić wymagane pola');
+                    return;
+                }
+            } else if (type === 'class-absence') {
+                eventData.startDate = document.getElementById('class-absence-start-date').value;
+                eventData.endDate = document.getElementById('class-absence-end-date').value || eventData.startDate;
+                eventData.allDay = document.getElementById('all-day').checked;
+                eventData.description = document.getElementById('class-absence-description').value;
+                
+                if (!eventData.allDay) {
+                    const startTime = document.getElementById('start-time').value;
+                    const endTime = document.getElementById('end-time').value;
+                    eventData.startTime = startTime;
+                    eventData.endTime = endTime;
+                    eventData.timeRange = `${startTime}-${endTime}`;
+                }
+                
+                if (!eventData.startDate) {
+                    alert('Proszę wypełnić datę');
                     return;
                 }
             } else if (type === 'substitution') {
@@ -1241,7 +1332,7 @@ function displayNews() {
             
             if (isEdit) {
                 // For editing, first remove the old event
-                if (currentEditingEvent.type === 'absence' || currentEditingEvent.type === 'holiday') {
+                if (currentEditingEvent.type === 'absence' || currentEditingEvent.type === 'holiday' || currentEditingEvent.type === 'class-absence') {
                     const startDate = new Date(currentEditingEvent.startDate);
                     const endDate = new Date(currentEditingEvent.endDate || currentEditingEvent.startDate);
                     
@@ -1250,7 +1341,6 @@ function displayNews() {
                         if (events[dateKey]) {
                             events[dateKey] = events[dateKey].filter(e => 
                                 !(e.type === currentEditingEvent.type && 
-                                  e.teacher === currentEditingEvent.teacher && 
                                   e.startDate === currentEditingEvent.startDate)
                             );
                             if (events[dateKey].length === 0) {
@@ -1276,18 +1366,28 @@ function displayNews() {
                     ? `w dniu ${formatDate(eventData.startDate)}`
                     : `od ${formatDate(eventData.startDate)} do ${formatDate(eventData.endDate)}`;
                 newsDetails = `${eventData.teacher} ${dateRange}`;
+            } else if (type === 'class-absence') {
+                const timeInfo = eventData.allDay ? '' : ` w godzinach ${eventData.timeRange}`;
+                newsAction = isEdit 
+                    ? `Zmieniono nieobecność klasy w dniu ${formatDate(eventData.startDate)}${timeInfo}`
+                    : `Dodano nieobecność klasy w dniu ${formatDate(eventData.startDate)}${timeInfo}`;
+                newsDetails = eventData.description || '';
             } else if (type === 'substitution') {
-                newsAction = isEdit ? 'Zmieniono zastępstwo' : 'Dodano zastępstwo';
-                newsDetails = `${eventData.substitutionSubject} (lekcja ${eventData.lesson}) w dniu ${formatDate(eventData.date)}`;
+                const actionVerb = isEdit ? 'Zmieniono' : 'Dodano';
+                newsAction = `${actionVerb} zastępstwo w dniu ${formatDate(eventData.date)}.`;
+                newsDetails = `${eventData.originalSubject} > ${eventData.substitutionSubject} (${eventData.substitutedTeacher} > ${eventData.substitutingTeacher}) (lekcja ${eventData.lesson})`;
             } else if (type === 'cancelled') {
-                newsAction = isEdit ? 'Zmieniono odwołaną lekcję' : 'Dodano odwołaną lekcję';
-                newsDetails = `lekcja ${eventData.lesson} w dniu ${formatDate(eventData.date)}`;
+                const actionVerb = isEdit ? 'Zmieniono odwołanie' : 'Odwołano';
+                newsAction = `${actionVerb} lekcję ${eventData.subject || ''} w dniu ${formatDate(eventData.date)}`;
+                newsDetails = `(lekcja ${eventData.lesson})`;
             } else if (type === 'quiz') {
-                newsAction = isEdit ? 'Zmieniono kartkówkę' : 'Dodano kartkówkę';
-                newsDetails = `z ${eventData.subject} w dniu ${formatDate(eventData.date)}`;
+                const actionVerb = isEdit ? 'Zmieniono' : 'Dodano';
+                newsAction = `${actionVerb} wydarzenie w dniu ${formatDate(eventData.date)}: Kartkówka`;
+                newsDetails = `Przedmiot: ${eventData.subject} (lekcja ${eventData.lesson})`;
             } else if (type === 'exam') {
-                newsAction = isEdit ? 'Zmieniono sprawdzian' : 'Dodano sprawdzian';
-                newsDetails = `z ${eventData.subject} w dniu ${formatDate(eventData.date)}`;
+                const actionVerb = isEdit ? 'Zmieniono' : 'Dodano';
+                newsAction = `${actionVerb} wydarzenie w dniu ${formatDate(eventData.date)}: Sprawdzian`;
+                newsDetails = `Przedmiot: ${eventData.subject} (lekcja ${eventData.lesson})`;
             } else if (type === 'holiday') {
                 newsAction = isEdit ? 'Zmieniono dzień wolny' : 'Dodano dzień wolny';
                 const dateRange = eventData.startDate === eventData.endDate 
@@ -1299,7 +1399,7 @@ function displayNews() {
             // Add new/updated event
             let dateKey;
             
-            if (type === 'absence' || type === 'holiday') {
+            if (type === 'absence' || type === 'holiday' || type === 'class-absence') {
                 const startDate = new Date(eventData.startDate);
                 const endDate = new Date(eventData.endDate);
                 
@@ -1343,7 +1443,10 @@ function displayNews() {
         // Format date for display
         function formatDate(dateString) {
             const date = new Date(dateString);
-            return date.toLocaleDateString('pl-PL');
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
         }
         
         // Format date and time for display
@@ -1373,7 +1476,7 @@ function displayNews() {
         });
         
         // Event listeners
-monthSelect.addEventListener('change', updateCalendarFromSelector);
+        monthSelect.addEventListener('change', updateCalendarFromSelector);
         addEventBtn.addEventListener('click', () => showEventForm());
         closeModal.addEventListener('click', () => {
             eventModal.style.display = 'none';
