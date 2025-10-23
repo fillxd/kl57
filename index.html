@@ -725,72 +725,76 @@
                         calendarHTML += `<td class="${isWeekend ? 'weekend' : ''}" data-date="${dateStr}">`;
                         calendarHTML += `<div class="day-number">${dayOfMonth}</div>`;
                         
-                        allDayEvents.forEach((event, index) => {
-                            let eventClass = '';
-                            let eventText = '';
-                            let isImported = event.imported;
-                            
-                            if (event.type === 'absence') {
-                                eventClass = 'absence';
-                                eventText = `Nieobecność: ${event.teacher}`;
-                                if (event.timeRange) {
-                                    eventText += ` (${event.timeRange})`;
-                                } else if (event.lessons) {
-                                    eventText += ` (Lekcje ${event.lessons})`;
-                                }
-                                if (isImported) eventText = `📋 ${eventText}`;
-                            } else if (event.type === 'substitution') {
-                                eventClass = 'substitution';
-                                eventText = `Zastępstwo: ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutingTeacher}) (lekcja ${event.lesson})`;
-                            } else if (event.type === 'cancelled') {
-                                eventClass = 'cancelled';
-                                eventText = `Odwołana lekcja: ${event.subject || 'Lekcja'} (lekcja ${event.lesson})`;
-                            } else if (event.type === 'quiz') {
-                                eventClass = 'quiz';
-                                eventText = `Kartkówka: ${event.subject} (lekcja ${event.lesson})`;
-                            } else if (event.type === 'exam') {
-                                eventClass = 'exam';
-                                eventText = `Sprawdzian: ${event.subject} (lekcja ${event.lesson})`;
-                            } else if (event.type === 'holiday') {
-                                eventClass = 'holiday';
-                                eventText = `Dzień Wolny: ${event.title}`;
-                                if (isImported) eventText = `📋 ${eventText}`;
-                            } else if (event.type === 'class-absence') {
-                                eventClass = 'class-absence';
-                                eventText = `Nieobecność klasy 5B (${event.allDay ? 'Cały dzień' : event.timeRange})`;
-                            }
-                            
-                            calendarHTML += `<div class="event ${eventClass}" data-date="${dateStr}" data-index="${index}" data-imported="${isImported}">${eventText}</div>`;
-                        });
-                        
-                        calendarHTML += '</td>';
-                        date++;
-                    }
-                }
-                
-                calendarHTML += '</tr>';
-                
-                if (date > daysInMonth) {
-                    break;
-                }
-            }
-            
-            calendarBody.innerHTML = calendarHTML;
-            
-            document.querySelectorAll('.event').forEach(eventEl => {
-                eventEl.addEventListener('click', function() {
-                    const date = this.getAttribute('data-date');
-                    const index = parseInt(this.getAttribute('data-index'));
-                    const isImported = this.getAttribute('data-imported') === 'true';
-                    
-                    if (!isImported) {
-                        showEventDetails(date, index);
-                    } else {
-                        showImportedEventDetails(date, index);
-                    }
-                });
-            });
+                       let localIndex = 0;
+let importedIndex = 0;
+
+allDayEvents.forEach((event) => {
+    let eventClass = '';
+    let eventText = '';
+    let isImported = event.imported;
+    let currentIndex = isImported ? importedIndex++ : localIndex++;
+    
+    if (event.type === 'absence') {
+        eventClass = 'absence';
+        eventText = `Nieobecność: ${event.teacher}`;
+        if (event.timeRange) {
+            eventText += ` (${event.timeRange})`;
+        } else if (event.lessons) {
+            eventText += ` (Lekcje ${event.lessons})`;
         }
+        if (isImported) eventText = `📋 ${eventText}`;
+    } else if (event.type === 'substitution') {
+        eventClass = 'substitution';
+        eventText = `Zastępstwo: ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutingTeacher}) (lekcja ${event.lesson})`;
+    } else if (event.type === 'cancelled') {
+        eventClass = 'cancelled';
+        eventText = `Odwołana lekcja: ${event.subject || 'Lekcja'} (lekcja ${event.lesson})`;
+    } else if (event.type === 'quiz') {
+        eventClass = 'quiz';
+        eventText = `Kartkówka: ${event.subject} (lekcja ${event.lesson})`;
+    } else if (event.type === 'exam') {
+        eventClass = 'exam';
+        eventText = `Sprawdzian: ${event.subject} (lekcja ${event.lesson})`;
+    } else if (event.type === 'holiday') {
+        eventClass = 'holiday';
+        eventText = `Dzień Wolny: ${event.title}`;
+        if (isImported) eventText = `📋 ${eventText}`;
+    } else if (event.type === 'class-absence') {
+        eventClass = 'class-absence';
+        eventText = `Nieobecność klasy 5B (${event.allDay ? 'Cały dzień' : event.timeRange})`;
+    }
+    
+    calendarHTML += `<div class="event ${eventClass}" data-date="${dateStr}" data-index="${currentIndex}" data-imported="${isImported}">${eventText}</div>`;
+});
+
+calendarHTML += '</td>';
+date++;
+}
+}
+
+calendarHTML += '</tr>';
+
+if (date > daysInMonth) {
+    break;
+}
+}
+
+calendarBody.innerHTML = calendarHTML;
+
+document.querySelectorAll('.event').forEach(eventEl => {
+    eventEl.addEventListener('click', function() {
+        const date = this.getAttribute('data-date');
+        const index = parseInt(this.getAttribute('data-index'));
+        const isImported = this.getAttribute('data-imported') === 'true';
+        
+        if (!isImported) {
+            showEventDetails(date, index);
+        } else {
+            showImportedEventDetails(date, index);
+        }
+    });
+});
+}
         
         // Display news
         function displayNews() {
@@ -841,31 +845,31 @@
         }
         
         // Show event details for imported events (tylko podgląd)
-        function showImportedEventDetails(date, index) {
-            const event = importedEvents[date][index];
-            let detailsHTML = '';
-            
-            if (event.type === 'absence') {
-                detailsHTML = `
-                    <h3>Nieobecność (zaimportowane)</h3>
-                    <div class="event-details">
-                        <p><strong>Nauczyciel:</strong> ${event.teacher}</p>
-                        <p><strong>Data:</strong> ${formatDate(event.startDate)}${event.endDate && event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</p>
-                        ${event.timeRange ? `<p><strong>Godziny:</strong> ${event.timeRange}</p>` : ''}
-                        ${event.reason ? `<p><strong>Powód:</strong> ${event.reason}</p>` : ''}
-                        <p><strong>Źródło:</strong> Główny terminarz szkolny</p>
-                    </div>
-                `;
-            } else if (event.type === 'holiday') {
-                detailsHTML = `
-                    <h3>Dzień Wolny (zaimportowane)</h3>
-                    <div class="event-details">
-                        <p><strong>Tytuł:</strong> ${event.title}</p>
-                        <p><strong>Data:</strong> ${formatDate(event.startDate)}${event.endDate && event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</p>
-                        <p><strong>Źródło:</strong> Główny terminarz szkolny</p>
-                    </div>
-                `;
-            }
+function showImportedEventDetails(date, index) {
+    const event = importedEvents[date][index];
+    let detailsHTML = '';
+    
+    if (event.type === 'absence') {
+        detailsHTML = `
+            <h3>Nieobecność (zaimportowane)</h3>
+            <div class="event-details">
+                <p><strong>Nauczyciel:</strong> ${event.teacher}</p>
+                <p><strong>Data:</strong> ${formatDate(event.startDate)}${event.endDate && event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</p>
+                ${event.timeRange ? `<p><strong>Godziny:</strong> ${event.timeRange}</p>` : ''}
+                ${event.reason ? `<p><strong>Powód:</strong> ${event.reason}</p>` : ''}
+                ${event.createdAt ? `<p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>` : ''}
+            </div>
+        `;
+    } else if (event.type === 'holiday') {
+        detailsHTML = `
+            <h3>Dzień Wolny (zaimportowane)</h3>
+            <div class="event-details">
+                <p><strong>Tytuł:</strong> ${event.title}</p>
+                <p><strong>Data:</strong> ${formatDate(event.startDate)}${event.endDate && event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</p>
+                ${event.createdAt ? `<p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>` : ''}
+            </div>
+        `;
+    }
             
             detailsHTML += `
                 <div class="event-actions">
