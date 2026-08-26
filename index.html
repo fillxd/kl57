@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminarz Klasy</title>
+    <title>Terminarz Klasy 5b</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
         * {
@@ -35,10 +35,13 @@
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         h1 {
             color: #2c3e50;
+            font-size: 24px;
         }
 
         .month-selector {
@@ -47,22 +50,49 @@
             gap: 10px;
         }
 
+        .month-selector label {
+            font-weight: 500;
+        }
+
         select {
             padding: 8px 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
+            background: white;
+        }
+
+        .nav-button {
+            background: none;
+            border: 2px solid #3498db;
+            color: #3498db;
+            padding: 2px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+            line-height: 1.4;
+        }
+
+        .nav-button:hover {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .nav-button:active {
+            transform: scale(0.95);
         }
 
         .add-button {
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
             transition: background-color 0.3s;
+            font-size: 16px;
         }
 
         .add-button:hover {
@@ -120,6 +150,7 @@
             border-radius: 3px;
             font-size: 12px;
             cursor: pointer;
+            word-break: break-word;
         }
 
         .absence {
@@ -177,6 +208,8 @@
             width: 90%;
             max-width: 500px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-header {
@@ -227,6 +260,7 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .time-range input[type="time"] {
@@ -283,6 +317,7 @@
             display: flex;
             gap: 10px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
 
         .event-type-selector {
@@ -331,7 +366,6 @@
             text-decoration: underline;
         }
         
-        /* Styl dla zakładki Aktualności */
         .tabs {
             display: flex;
             margin-bottom: 20px;
@@ -383,6 +417,48 @@
             font-weight: bold;
             color: #2c3e50;
         }
+
+        .info-box {
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        /* Responsywność */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .month-selector {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .calendar td {
+                height: 80px;
+                padding: 5px;
+                font-size: 11px;
+            }
+            
+            .event {
+                font-size: 9px;
+                padding: 2px 4px;
+                margin-top: 2px;
+            }
+            
+            .day-number {
+                font-size: 12px;
+            }
+            
+            .calendar th {
+                padding: 6px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -390,31 +466,24 @@
     <a href="https://fillxd.github.io/sz57">Syst</a>
     <a href="https://fillxd.github.io/tm57">TM</a>
     <a href="https://fillxd.github.io/pl57">Plan</a>
-        <a href="https://fillxd.github.io/na57">MG</a>
+    <a href="https://fillxd.github.io/na57">MG</a>
     <a href="https://fillxd.github.io/tk57">D5b</a>
     <a href="https://fillxd.github.io/kl57">T5b</a>
- <a href="https://docs.google.com/spreadsheets/d/18OV9Sar_ENFseGPn8wppwrIeJXm6j4dsa890OTg6Ioo/edit?gid=1302175797#gid=1302175797">ARK</a>
+    <a href="https://docs.google.com/spreadsheets/d/18OV9Sar_ENFseGPn8wppwrIeJXm6j4dsa890OTg6Ioo/edit?gid=1302175797#gid=1302175797">ARK</a>
 </div>
 
     <div class="container">
         <header>
             <h1>Terminarz Klasy 5b</h1>
             <div class="month-selector">
+                <button id="prev-month" class="nav-button" title="Poprzedni miesiąc">◀</button>
                 <label for="month-select">Miesiąc:</label>
                 <select id="month-select">
-                    <option value="2025-09">Wrzesień 2025</option>
-                    <option value="2025-10">Październik 2025</option>
-                    <option value="2025-11">Listopad 2025</option>
-                    <option value="2025-12">Grudzień 2025</option>
-                    <option value="2026-01">Styczeń 2026</option>
-                    <option value="2026-02">Luty 2026</option>
-                    <option value="2026-03">Marzec 2026</option>
-                    <option value="2026-04">Kwiecień 2026</option>
-                    <option value="2026-05">Maj 2026</option>
-                    <option value="2026-06">Czerwiec 2026</option>
+                    <!-- Opcje będą generowane dynamicznie przez JavaScript -->
                 </select>
+                <button id="next-month" class="nav-button" title="Następny miesiąc">▶</button>
             </div>
-            <button class="add-button" id="add-event-btn">DODAJ</button>
+            <button class="add-button" id="add-event-btn">+ DODAJ</button>
         </header>
 
         <!-- Zakładki Terminarz i Aktualności -->
@@ -506,6 +575,14 @@
         let currentEditingDate = null;
         let currentEditingIndex = null;
         
+        // Zakres miesięcy (tak samo jak w głównym terminarzu)
+        const MONTH_RANGE = {
+            startYear: 2025,
+            startMonth: 8,  // wrzesień
+            endYear: 2027,
+            endMonth: 5     // maj
+        };
+        
         // Lista nauczycieli tej klasy
         const classTeachers = [
             "Michał Tarczyn",
@@ -534,6 +611,65 @@
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
         const newsContainer = document.getElementById('news-container');
+        
+        // Sprawdzenie czy miesiąc jest w zakresie
+        function checkIfMonthInRange(year, month) {
+            if (year < MONTH_RANGE.startYear || year > MONTH_RANGE.endYear) {
+                return false;
+            }
+            if (year === MONTH_RANGE.startYear && month < MONTH_RANGE.startMonth) {
+                return false;
+            }
+            if (year === MONTH_RANGE.endYear && month > MONTH_RANGE.endMonth) {
+                return false;
+            }
+            return true;
+        }
+
+        // Generowanie opcji w select miesięcy
+        function populateMonthSelector() {
+            let optionsHTML = '';
+
+            for (let year = MONTH_RANGE.startYear; year <= MONTH_RANGE.endYear; year++) {
+                const startM = (year === MONTH_RANGE.startYear) ? MONTH_RANGE.startMonth : 0;
+                const endM = (year === MONTH_RANGE.endYear) ? MONTH_RANGE.endMonth : 11;
+
+                for (let month = startM; month <= endM; month++) {
+                    const date = new Date(year, month, 1);
+                    const monthName = date.toLocaleString('pl-PL', { month: 'long' });
+                    const value = `${year}-${String(month + 1).padStart(2, '0')}`;
+                    optionsHTML += `<option value="${value}">${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${year}</option>`;
+                }
+            }
+
+            monthSelect.innerHTML = optionsHTML;
+        }
+
+        // Nawigacja między miesiącami
+        function navigateMonth(direction) {
+            const currentValue = monthSelect.value;
+
+            if (!currentValue) {
+                monthSelect.selectedIndex = 0;
+                updateCalendarFromSelector();
+                return;
+            }
+
+            const [year, month] = currentValue.split('-').map(Number);
+            const currentDate = new Date(year, month - 1, 1);
+            currentDate.setMonth(currentDate.getMonth() + direction);
+
+            const newYear = currentDate.getFullYear();
+            const newMonth = currentDate.getMonth();
+
+            if (!checkIfMonthInRange(newYear, newMonth)) {
+                return;
+            }
+
+            const newValue = `${newYear}-${String(newMonth + 1).padStart(2, '0')}`;
+            monthSelect.value = newValue;
+            updateCalendarFromSelector();
+        }
         
         // Load events from Firebase (własne wydarzenia klasy)
         function loadClassEvents() {
@@ -669,21 +805,34 @@
 		
         // Update calendar based on month selector
         function updateCalendarFromSelector() {
+            if (!monthSelect.value) {
+                monthSelect.selectedIndex = 0;
+            }
             const [year, month] = monthSelect.value.split('-').map(Number);
-            generateCalendar(year, month - 1); // month - 1 bo miesiące są 0-11
+            generateCalendar(year, month - 1);
         }
 
         async function initCalendar() {
             // Load events and news from Firebase
             await Promise.all([loadClassEvents(), loadMainCalendarEvents(), loadNews()]);
             
+            // Generuj opcje miesięcy
+            populateMonthSelector();
+            
             // Start tracking main calendar changes
             trackMainCalendarChanges();
             
-            // Ustaw aktualny miesiąc i rok
+            // Ustaw aktualny miesiąc i rok (jeśli w zakresie)
             const now = new Date();
-            const currentMonthValue = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            monthSelect.value = currentMonthValue;
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+            
+            if (checkIfMonthInRange(currentYear, currentMonth)) {
+                const currentValue = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+                monthSelect.value = currentValue;
+            } else {
+                monthSelect.selectedIndex = 0;
+            }
             
             // Generuj kalendarz dla wybranego miesiąca
             updateCalendarFromSelector();
@@ -725,76 +874,76 @@
                         calendarHTML += `<td class="${isWeekend ? 'weekend' : ''}" data-date="${dateStr}">`;
                         calendarHTML += `<div class="day-number">${dayOfMonth}</div>`;
                         
-                       let localIndex = 0;
-let importedIndex = 0;
+                        let localIndex = 0;
+                        let importedIndex = 0;
 
-allDayEvents.forEach((event) => {
-    let eventClass = '';
-    let eventText = '';
-    let isImported = event.imported;
-    let currentIndex = isImported ? importedIndex++ : localIndex++;
-    
-    if (event.type === 'absence') {
-        eventClass = 'absence';
-        eventText = `Nieobecność: ${event.teacher}`;
-        if (event.timeRange) {
-            eventText += ` (${event.timeRange})`;
-        } else if (event.lessons) {
-            eventText += ` (Lekcje ${event.lessons})`;
+                        allDayEvents.forEach((event) => {
+                            let eventClass = '';
+                            let eventText = '';
+                            let isImported = event.imported;
+                            let currentIndex = isImported ? importedIndex++ : localIndex++;
+                            
+                            if (event.type === 'absence') {
+                                eventClass = 'absence';
+                                eventText = `Nieobecność: ${event.teacher}`;
+                                if (event.timeRange) {
+                                    eventText += ` (${event.timeRange})`;
+                                } else if (event.lessons) {
+                                    eventText += ` (Lekcje ${event.lessons})`;
+                                }
+                                if (isImported) eventText = `📋 ${eventText}`;
+                            } else if (event.type === 'substitution') {
+                                eventClass = 'substitution';
+                                eventText = `Zastępstwo: ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutingTeacher})`;
+                            } else if (event.type === 'cancelled') {
+                                eventClass = 'cancelled';
+                                eventText = `Odwołana lekcja: ${event.subject || 'Lekcja'}`;
+                            } else if (event.type === 'quiz') {
+                                eventClass = 'quiz';
+                                eventText = `Kartkówka: ${event.subject}`;
+                            } else if (event.type === 'exam') {
+                                eventClass = 'exam';
+                                eventText = `Sprawdzian: ${event.subject}`;
+                            } else if (event.type === 'holiday') {
+                                eventClass = 'holiday';
+                                eventText = `Dzień Wolny: ${event.title}`;
+                                if (isImported) eventText = `📋 ${eventText}`;
+                            } else if (event.type === 'class-absence') {
+                                eventClass = 'class-absence';
+                                eventText = `Nieobecność klasy 5B (${event.allDay ? 'Cały dzień' : event.timeRange})`;
+                            }
+                            
+                            calendarHTML += `<div class="event ${eventClass}" data-date="${dateStr}" data-index="${currentIndex}" data-imported="${isImported}">${eventText}</div>`;
+                        });
+
+                        calendarHTML += '</td>';
+                        date++;
+                    }
+                }
+
+                calendarHTML += '</tr>';
+
+                if (date > daysInMonth) {
+                    break;
+                }
+            }
+
+            calendarBody.innerHTML = calendarHTML;
+
+            document.querySelectorAll('.event').forEach(eventEl => {
+                eventEl.addEventListener('click', function() {
+                    const date = this.getAttribute('data-date');
+                    const index = parseInt(this.getAttribute('data-index'));
+                    const isImported = this.getAttribute('data-imported') === 'true';
+                    
+                    if (!isImported) {
+                        showEventDetails(date, index);
+                    } else {
+                        showImportedEventDetails(date, index);
+                    }
+                });
+            });
         }
-        if (isImported) eventText = `📋 ${eventText}`;
-    } else if (event.type === 'substitution') {
-        eventClass = 'substitution';
-        eventText = `Zastępstwo: ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutingTeacher}) (lekcja ${event.lesson})`;
-    } else if (event.type === 'cancelled') {
-        eventClass = 'cancelled';
-        eventText = `Odwołana lekcja: ${event.subject || 'Lekcja'} (lekcja ${event.lesson})`;
-    } else if (event.type === 'quiz') {
-        eventClass = 'quiz';
-        eventText = `Kartkówka: ${event.subject} (lekcja ${event.lesson})`;
-    } else if (event.type === 'exam') {
-        eventClass = 'exam';
-        eventText = `Sprawdzian: ${event.subject} (lekcja ${event.lesson})`;
-    } else if (event.type === 'holiday') {
-        eventClass = 'holiday';
-        eventText = `Dzień Wolny: ${event.title}`;
-        if (isImported) eventText = `📋 ${eventText}`;
-    } else if (event.type === 'class-absence') {
-        eventClass = 'class-absence';
-        eventText = `Nieobecność klasy 5B (${event.allDay ? 'Cały dzień' : event.timeRange})`;
-    }
-    
-    calendarHTML += `<div class="event ${eventClass}" data-date="${dateStr}" data-index="${currentIndex}" data-imported="${isImported}">${eventText}</div>`;
-});
-
-calendarHTML += '</td>';
-date++;
-}
-}
-
-calendarHTML += '</tr>';
-
-if (date > daysInMonth) {
-    break;
-}
-}
-
-calendarBody.innerHTML = calendarHTML;
-
-document.querySelectorAll('.event').forEach(eventEl => {
-    eventEl.addEventListener('click', function() {
-        const date = this.getAttribute('data-date');
-        const index = parseInt(this.getAttribute('data-index'));
-        const isImported = this.getAttribute('data-imported') === 'true';
-        
-        if (!isImported) {
-            showEventDetails(date, index);
-        } else {
-            showImportedEventDetails(date, index);
-        }
-    });
-});
-}
         
         // Display news
         function displayNews() {
@@ -845,31 +994,31 @@ document.querySelectorAll('.event').forEach(eventEl => {
         }
         
         // Show event details for imported events (tylko podgląd)
-function showImportedEventDetails(date, index) {
-    const event = importedEvents[date][index];
-    let detailsHTML = '';
-    
-    if (event.type === 'absence') {
-        detailsHTML = `
-            <h3>Nieobecność (zaimportowane)</h3>
-            <div class="event-details">
-                <p><strong>Nauczyciel:</strong> ${event.teacher}</p>
-                <p><strong>Data:</strong> ${formatDate(event.startDate)}${event.endDate && event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</p>
-                ${event.timeRange ? `<p><strong>Godziny:</strong> ${event.timeRange}</p>` : ''}
-                ${event.reason ? `<p><strong>Powód:</strong> ${event.reason}</p>` : ''}
-                ${event.createdAt ? `<p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>` : ''}
-            </div>
-        `;
-    } else if (event.type === 'holiday') {
-        detailsHTML = `
-            <h3>Dzień Wolny (zaimportowane)</h3>
-            <div class="event-details">
-                <p><strong>Tytuł:</strong> ${event.title}</p>
-                <p><strong>Data:</strong> ${formatDate(event.startDate)}${event.endDate && event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</p>
-                ${event.createdAt ? `<p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>` : ''}
-            </div>
-        `;
-    }
+        function showImportedEventDetails(date, index) {
+            const event = importedEvents[date][index];
+            let detailsHTML = '';
+            
+            if (event.type === 'absence') {
+                detailsHTML = `
+                    <h3>Nieobecność (zaimportowane)</h3>
+                    <div class="event-details">
+                        <p><strong>Nauczyciel:</strong> ${event.teacher}</p>
+                        <p><strong>Data:</strong> ${formatDate(event.startDate)}${event.endDate && event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</p>
+                        ${event.timeRange ? `<p><strong>Godziny:</strong> ${event.timeRange}</p>` : ''}
+                        ${event.reason ? `<p><strong>Powód:</strong> ${event.reason}</p>` : ''}
+                        ${event.createdAt ? `<p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>` : ''}
+                    </div>
+                `;
+            } else if (event.type === 'holiday') {
+                detailsHTML = `
+                    <h3>Dzień Wolny (zaimportowane)</h3>
+                    <div class="event-details">
+                        <p><strong>Tytuł:</strong> ${event.title}</p>
+                        <p><strong>Data:</strong> ${formatDate(event.startDate)}${event.endDate && event.endDate !== event.startDate ? ` - ${formatDate(event.endDate)}` : ''}</p>
+                        ${event.createdAt ? `<p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>` : ''}
+                    </div>
+                `;
+            }
             
             detailsHTML += `
                 <div class="event-actions">
@@ -906,8 +1055,9 @@ function showImportedEventDetails(date, index) {
                 detailsHTML = `
                     <h3>Zastępstwo</h3>
                     <div class="event-details">
-                        <p><strong>Zastępstwo:</strong> ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutedTeacher} > ${event.substitutingTeacher}) (lekcja ${event.lesson})</p>
+                        <p><strong>Zastępstwo:</strong> ${event.originalSubject} > ${event.substitutionSubject} (${event.substitutedTeacher} > ${event.substitutingTeacher})</p>
                         <p><strong>Data:</strong> ${formatDate(event.date)}</p>
+                        <p><strong>Lekcja:</strong> ${event.lesson}</p>
                         <p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>
                     </div>
                 `;
@@ -931,7 +1081,7 @@ function showImportedEventDetails(date, index) {
                         <p><strong>Przedmiot:</strong> ${event.subject}</p>
                         <p><strong>Data:</strong> ${formatDate(event.date)}</p>
                         <p><strong>Lekcja:</strong> ${event.lesson}</p>
-                        <p><strong>Opis:</strong> ${event.description}</p>
+                        <p><strong>Opis:</strong> ${event.description || 'Brak'}</p>
                         <p><strong>Nauczyciel:</strong> ${event.teacher}</p>
                         <p><strong>Dodano:</strong> ${formatDateTime(event.createdAt)}</p>
                     </div>
@@ -990,16 +1140,16 @@ function showImportedEventDetails(date, index) {
                         newsDetails = `${currentEditingEvent.teacher} ${dateRange}`;
                     } else if (currentEditingEvent.type === 'substitution') {
                         newsAction = `Usunięto zastępstwo w dniu ${formatDate(currentEditingEvent.date)}.`;
-                        newsDetails = `${currentEditingEvent.originalSubject} > ${currentEditingEvent.substitutionSubject} (${currentEditingEvent.substitutedTeacher} > ${currentEditingEvent.substitutingTeacher}) (lekcja ${currentEditingEvent.lesson})`;
+                        newsDetails = `${currentEditingEvent.originalSubject} > ${currentEditingEvent.substitutionSubject} (${currentEditingEvent.substitutedTeacher} > ${currentEditingEvent.substitutingTeacher})`;
                     } else if (currentEditingEvent.type === 'cancelled') {
                         newsAction = `Usunięto odwołanie lekcji ${currentEditingEvent.subject || ''} w dniu ${formatDate(currentEditingEvent.date)}`;
                         newsDetails = `(lekcja ${currentEditingEvent.lesson})`;
                     } else if (currentEditingEvent.type === 'quiz') {
                         newsAction = `Usunięto wydarzenie w dniu ${formatDate(currentEditingEvent.date)}: Kartkówka`;
-                        newsDetails = `Przedmiot: ${currentEditingEvent.subject} (lekcja ${currentEditingEvent.lesson})`;
+                        newsDetails = `Przedmiot: ${currentEditingEvent.subject}`;
                     } else if (currentEditingEvent.type === 'exam') {
                         newsAction = `Usunięto wydarzenie w dniu ${formatDate(currentEditingEvent.date)}: Sprawdzian`;
-                        newsDetails = `Przedmiot: ${currentEditingEvent.subject} (lekcja ${currentEditingEvent.lesson})`;
+                        newsDetails = `Przedmiot: ${currentEditingEvent.subject}`;
                     } else if (currentEditingEvent.type === 'holiday') {
                         newsAction = 'Usunięto dzień wolny';
                         const dateRange = currentEditingEvent.startDate === currentEditingEvent.endDate || !currentEditingEvent.endDate 
@@ -1031,9 +1181,11 @@ function showImportedEventDetails(date, index) {
                         }
                     } else {
                         // For single date events
-                        events[date].splice(index, 1);
-                        if (events[date].length === 0) {
-                            delete events[date];
+                        if (events[date]) {
+                            events[date].splice(index, 1);
+                            if (events[date].length === 0) {
+                                delete events[date];
+                            }
                         }
                     }
                     
@@ -1196,7 +1348,7 @@ function showImportedEventDetails(date, index) {
                     </div>
                     <div class="form-group">
                         <label for="event-description">Opis:</label>
-                        <textarea id="event-description">${isEdit ? eventData.description : ''}</textarea>
+                        <textarea id="event-description">${isEdit ? eventData.description || '' : ''}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="event-teacher">Nauczyciel:</label>
@@ -1353,9 +1505,11 @@ function showImportedEventDetails(date, index) {
                         }
                     }
                 } else {
-                    events[currentEditingDate].splice(currentEditingIndex, 1);
-                    if (events[currentEditingDate].length === 0) {
-                        delete events[currentEditingDate];
+                    if (events[currentEditingDate]) {
+                        events[currentEditingDate].splice(currentEditingIndex, 1);
+                        if (events[currentEditingDate].length === 0) {
+                            delete events[currentEditingDate];
+                        }
                     }
                 }
             }
@@ -1379,7 +1533,7 @@ function showImportedEventDetails(date, index) {
             } else if (type === 'substitution') {
                 const actionVerb = isEdit ? 'Zmieniono' : 'Dodano';
                 newsAction = `${actionVerb} zastępstwo w dniu ${formatDate(eventData.date)}.`;
-                newsDetails = `${eventData.originalSubject} > ${eventData.substitutionSubject} (${eventData.substitutedTeacher} > ${eventData.substitutingTeacher}) (lekcja ${eventData.lesson})`;
+                newsDetails = `${eventData.originalSubject} > ${eventData.substitutionSubject} (${eventData.substitutedTeacher} > ${eventData.substitutingTeacher})`;
             } else if (type === 'cancelled') {
                 const actionVerb = isEdit ? 'Zmieniono odwołanie' : 'Odwołano';
                 newsAction = `${actionVerb} lekcję ${eventData.subject || ''} w dniu ${formatDate(eventData.date)}`;
@@ -1387,11 +1541,11 @@ function showImportedEventDetails(date, index) {
             } else if (type === 'quiz') {
                 const actionVerb = isEdit ? 'Zmieniono' : 'Dodano';
                 newsAction = `${actionVerb} wydarzenie w dniu ${formatDate(eventData.date)}: Kartkówka`;
-                newsDetails = `Przedmiot: ${eventData.subject} (lekcja ${eventData.lesson})`;
+                newsDetails = `Przedmiot: ${eventData.subject}`;
             } else if (type === 'exam') {
                 const actionVerb = isEdit ? 'Zmieniono' : 'Dodano';
                 newsAction = `${actionVerb} wydarzenie w dniu ${formatDate(eventData.date)}: Sprawdzian`;
-                newsDetails = `Przedmiot: ${eventData.subject} (lekcja ${eventData.lesson})`;
+                newsDetails = `Przedmiot: ${eventData.subject}`;
             } else if (type === 'holiday') {
                 newsAction = isEdit ? 'Zmieniono dzień wolny' : 'Dodano dzień wolny';
                 const dateRange = eventData.startDate === eventData.endDate 
@@ -1446,6 +1600,7 @@ function showImportedEventDetails(date, index) {
         
         // Format date for display
         function formatDate(dateString) {
+            if (!dateString) return 'Brak daty';
             const date = new Date(dateString);
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -1455,6 +1610,7 @@ function showImportedEventDetails(date, index) {
         
         // Format date and time for display
         function formatDateTime(dateTimeString) {
+            if (!dateTimeString) return 'Brak daty';
             const date = new Date(dateTimeString);
             return date.toLocaleString('pl-PL');
         }
@@ -1480,6 +1636,14 @@ function showImportedEventDetails(date, index) {
         });
         
         // Event listeners
+        document.getElementById('prev-month').addEventListener('click', function() {
+            navigateMonth(-1);
+        });
+
+        document.getElementById('next-month').addEventListener('click', function() {
+            navigateMonth(1);
+        });
+        
         monthSelect.addEventListener('change', updateCalendarFromSelector);
         addEventBtn.addEventListener('click', () => showEventForm());
         closeModal.addEventListener('click', () => {
